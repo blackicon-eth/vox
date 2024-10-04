@@ -2,13 +2,16 @@
 pragma solidity ^0.8.26;
 
 contract Vox {
-    mapping(uint256 => uint256) public petitionVotes;
-
-    function vote(uint256 petitionId) public {
-        petitionVotes[petitionId] += 1;
+    struct Petition {
+        address creator;
+        uint256 votes;
+        address[] voters;
     }
 
-    function getVotes(uint256 petitionId) public view returns (uint256) {
-        return petitionVotes[petitionId];
+    mapping(uint256 => Petition) public petitions;
+
+    function vote(uint256 petitionId, address voterAddress) public {
+        petitions[petitionId].votes += 1;
+        petitions[petitionId].voters.push(voterAddress);
     }
 }
