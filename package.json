@@ -17,6 +17,7 @@
     "@zkpass/transgate-js-sdk": "^0.3.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "ethers": "^6.13.3",
     "fhenixjs": "^0.4.0-alpha.0",
     "framer-motion": "^11.11.0",
     "lucide-react": "^0.447.0",
