@@ -52,7 +52,7 @@ export default function Navbar() {
     <motion.nav
       className="border-b border-[#8b4513] bg-[#d3c7a2] shadow-md"
       style={{
-        backgroundImage: "url('/paper-texture-2.jpg')",
+        backgroundImage: "url('/background/paper-texture-2.jpg')",
         backgroundBlendMode: "multiply",
       }}
       variants={navbarVariants}

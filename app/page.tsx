@@ -74,7 +74,7 @@ export default function Home() {
       <motion.div
         className="relative w-full max-w-2xl p-12 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
         style={{
-          backgroundImage: "url('/paper-texture-2.jpg')",
+          backgroundImage: "url('/background/paper-texture-2.jpg')",
           backgroundBlendMode: "multiply",
         }}
         variants={containerVariants}
