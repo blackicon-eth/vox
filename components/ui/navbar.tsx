@@ -74,18 +74,18 @@ export default function Navbar() {
             <div className="flex items-baseline space-x-4">
               <motion.div variants={linkVariants} whileHover="hover">
                 <Link
-                  href="/my-petitions"
+                  href="/petitions"
                   className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
                 >
-                  My petitions
+                  Petitions
                 </Link>
               </motion.div>
               <motion.div variants={linkVariants} whileHover="hover">
                 <Link
-                  href="/petitions"
+                  href="/create"
                   className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
                 >
-                  All petitons
+                  New petition
                 </Link>
               </motion.div>
             </div>
