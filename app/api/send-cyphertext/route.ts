@@ -44,42 +44,42 @@ export const POST = async (req: NextRequest) => {
     );
   }
 
-  try {
-    // Set up the provider with JsonRpcApiProvider
-    const provider = new JsonRpcProvider("https://rpc2.sepolia.org");
+  // try {
+  //   // Set up the provider with JsonRpcApiProvider
+  //   const provider = new JsonRpcProvider("https://rpc2.sepolia.org");
 
-    // Set up the signer using the private key
-    const signer = new Wallet(process.env.PRIVATE_KEY!, provider);
+  //   // Set up the signer using the private key
+  //   const signer = new Wallet(process.env.PRIVATE_KEY!, provider);
 
-    const abi = AttestationABI;
+  //   const abi = AttestationABI;
 
-    const contract = new Contract(attestationContract, abi, signer);
+  //   const contract = new Contract(attestationContract, abi, signer);
 
-    console.log("attesting . . .");
+  //   console.log("attesting...");
 
-    // Interact with the contract
-    const args = {
-      taskId,
-      schemaId,
-      uHash,
-      recipient,
-      publicFieldsHash,
-      validator,
-      allocatorSignature,
-      validatorSignature,
-    };
+  //   // Interact with the contract
+  //   const args = {
+  //     taskId,
+  //     schemaId,
+  //     uHash,
+  //     recipient,
+  //     publicFieldsHash,
+  //     validator,
+  //     allocatorSignature,
+  //     validatorSignature,
+  //   };
 
-    const tx = await contract.attest(args);
-    console.log("attested!");
-    // Wait for the transaction to be mined
-    const receipt = await tx.wait();
-  } catch (error: any) {
-    console.log(error.message);
-    console.log("camadonna");
-  }
+  //   const tx = await contract.attest(args);
+  //   console.log("attested!");
+  //   // Wait for the transaction to be mined
+  //   const receipt = await tx.wait();
+  // } catch (error: any) {
+  //   console.log("Error: ", error.message);
+  // }
+
   try {
     const fhenixProvider = new JsonRpcProvider(
-      "https://api.helium.fhenix.zone"
+      "https://7cca-87-241-41-114.ngrok-free.app/"
     );
 
     // initialize Fhenix Client
