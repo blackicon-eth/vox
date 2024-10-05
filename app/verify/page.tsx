@@ -5,12 +5,16 @@ import { useAccount, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
 import { AttestationABI } from "@/lib/abi/AttestationABI";
 import { contractAddress } from "@/lib/constants";
+import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [appId, setAppId] = useState(process.env.NEXT_PUBLIC_APP_ID || "");
   const [schemaId, setSchemaId] = useState(process.env.NEXT_PUBLIC_SCHEMA_ID || "");
   const [mintToken, setMintToken] = useState(false);
+  const { authenticated, ready } = usePrivy();
   const account = useAccount();
+  const router = useRouter();
   const { writeContract } = useWriteContract();
 
   // A function that starts the zkpass verification process and mints a token
@@ -55,6 +59,10 @@ export default function Home() {
       }
     }
   };
+
+  if (ready && !authenticated) {
+    router.push("/");
+  }
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen p-8 pb-20 sm:p-14 font-[family-name:var(--font-geist-sans)]">
