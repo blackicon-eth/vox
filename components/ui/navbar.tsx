@@ -52,7 +52,7 @@ export default function Navbar() {
     <motion.nav
       className="border-b border-[#8b4513] bg-[#d3c7a2] shadow-md"
       style={{
-        backgroundImage: "url('/paper-texture-2.jpg')",
+        backgroundImage: "url('/background/paper-texture-2.jpg')",
         backgroundBlendMode: "multiply",
       }}
       variants={navbarVariants}
@@ -102,7 +102,7 @@ export default function Navbar() {
                       className="relative h-12 w-12 rounded-full border-2 border-[#8b4513] hover:bg-[#c4b17e] transition-colors duration-200"
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src="/avatars/01.png" alt="@shadcn" />
+                        <AvatarImage className="bg-yellow-100" src="/avatars/feather.png" alt="@shadcn" />
                         <AvatarFallback>SC</AvatarFallback>
                       </Avatar>
                     </Button>
