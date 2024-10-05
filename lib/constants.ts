@@ -1,5 +1,4 @@
 // Contract to check if the user has an attestation of identity onchain
-export const identityContract = "0x82E1c3aFa1296567657C834846631645b222644f";
 
 // The zkPass allocator address
 export const allocatorAddress = "0x19a567b3b212a5b35bA0E3B600FbEd5c2eE9083d"; // TODO: change this with the correct address

@@ -35,9 +35,14 @@ export default function CreatePetition() {
 
   if (!ready) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[#f0e7d8]">
+      <motion.div
+        className="flex justify-center items-center h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
-      </div>
+      </motion.div>
     );
   }
 

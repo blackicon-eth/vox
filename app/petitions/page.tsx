@@ -40,7 +40,7 @@ export default function PetitionList() {
   const { ready, authenticated, user } = usePrivy();
   const router = useRouter();
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const fetchPetitions = useCallback(async () => {
     if (!authenticated) return;
@@ -88,7 +88,7 @@ export default function PetitionList() {
   if (!ready || loading) {
     return (
       <motion.div
-        className="flex justify-center items-center h-full bg-[#f0e7d8]"
+        className="flex justify-center items-center h-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -182,7 +182,7 @@ export default function PetitionList() {
               </div>
               {loading ? (
                 <motion.div
-                  className="flex justify-center items-center h-64"
+                  className="flex justify-center items-center h-full"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -304,22 +304,8 @@ export default function PetitionList() {
                     </p>
                   </div>
                   <DialogFooter>
-                    {selectedPetition.creator === user?.wallet?.address ? (
-                      <div>
-                        <Button
-                          onClick={() => console.log("Edit petition")}
-                          className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
-                        >
-                          Edit Petition
-                        </Button>
-                        <Button
-                          onClick={() => console.log("Delete petition")}
-                          className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
-                        >
-                          Delete Petition
-                        </Button>
-                      </div>
-                    ) : (
+                    {selectedPetition.creator ===
+                    user?.wallet?.address ? null : (
                       <div className="flex justify-center items-center gap-3">
                         <Button
                           onClick={() => console.log("Sign anonymously")}
@@ -382,8 +368,7 @@ export default function PetitionList() {
             <motion.button
               className="flex items-center justify-center bg-[#8b4513] hover:bg-[#6e3710] py-3 px-10 text-[#f0e7d8] rounded-lg text-lg font-semibold shadow-md"
               onClick={() => {
-                // Redirect to the identity creation page _blank
-                window.open("/verify", "_blank");
+                router.push("/verify");
               }}
               variants={buttonVariants}
               whileHover="hover"

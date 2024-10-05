@@ -3,8 +3,7 @@
 import { verify } from "@/lib/zkpass";
 import { useAccount, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
-import { AttestationABI } from "@/lib/abi/AttestationABI";
-import { contractAddress, mockedData } from "@/lib/constants";
+import { mockedData } from "@/lib/constants";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -12,9 +11,10 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   const { authenticated, ready, user } = usePrivy();
+  const [error, setError] = useState("");
+  const [finished, setFinished] = useState(false);
   const account = useAccount();
   const router = useRouter();
-  const { writeContract } = useWriteContract();
   const [glitchText, setGlitchText] = useState("VERIFY");
 
   useEffect(() => {
@@ -45,9 +45,14 @@ export default function Home() {
 
     // If the response is null, show an alert with the message
     if (!response && user?.wallet?.address) {
+      console.log("Transgate response failed");
       try {
-        const hexTaskId = ethers.hexlify(ethers.toUtf8Bytes(mockedData.taskId)) as `0x${string}`;
-        const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)) as `0x${string}`;
+        const hexTaskId = ethers.hexlify(
+          ethers.toUtf8Bytes(mockedData.taskId)
+        ) as `0x${string}`;
+        const hexSchemaId = ethers.hexlify(
+          ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)
+        ) as `0x${string}`;
 
         const args = {
           taskId: hexTaskId,
@@ -59,9 +64,9 @@ export default function Home() {
           allocatorSignature: mockedData.allocatorSignature as `0x${string}`,
           validatorSignature: mockedData.validatorSignature as `0x${string}`,
           publicFields: mockedData.publicFields,
-          embeddedAddress:  account.address,
+          embeddedAddress: account.address,
         };
-        
+
         try {
           const res = await fetch("/api/send-cyphertext", {
             method: "POST",
@@ -72,18 +77,20 @@ export default function Home() {
               data: args,
             }),
           });
-    
+
           if (!res.ok) {
             const error = await res.text();
             throw new Error(`Failed to send ciphertext: ${error}`);
           }
-        } catch (error: any){
+          setFinished(true);
+        } catch (error: any) {
           console.log(error.message);
+          setError("An error occurred while creating your identity.");
         }
-      
-      } catch (err) {
+      } catch (err: any) {
         alert(JSON.stringify(err));
-        console.log("error", err);
+        console.log("error: ", err.message);
+        setError("An error occurred while creating your identity.");
       }
       return;
     }
@@ -92,8 +99,12 @@ export default function Home() {
     console.log("Transgate response: ", response);
     if (response && response.recipient) {
       try {
-        const hexTaskId = ethers.hexlify(ethers.toUtf8Bytes(response.taskId)) as `0x${string}`;
-        const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)) as `0x${string}`;
+        const hexTaskId = ethers.hexlify(
+          ethers.toUtf8Bytes(response.taskId)
+        ) as `0x${string}`;
+        const hexSchemaId = ethers.hexlify(
+          ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)
+        ) as `0x${string}`;
         const args = {
           taskId: hexTaskId,
           schemaId: hexSchemaId,
@@ -104,7 +115,7 @@ export default function Home() {
           allocatorSignature: response.allocatorSignature,
           validatorSignature: response.validatorSignature,
           publicFields: response.publicFields,
-          embeddedAddress:  account.address,
+          embeddedAddress: account.address,
         };
 
         try {
@@ -117,19 +128,19 @@ export default function Home() {
               data: args,
             }),
           });
-    
+
           if (!res.ok) {
             const error = await res.text();
             throw new Error(`Failed to send ciphertext: ${error}`);
           }
-        } catch (error: any){
+          setFinished(true);
+        } catch (error: any) {
           console.log(error.message);
+          setError("An error occurred while creating your identity.");
         }
-   
-
-      } catch (err) {
-        alert(JSON.stringify(err));
-        console.log("error", err);
+      } catch (err: any) {
+        setError("An error occurred while creating your identity.");
+        console.log("error: ", err);
       }
     }
   };
@@ -148,10 +159,13 @@ export default function Home() {
         transition={{ duration: 1 }}
         className="flex flex-col z-10 justify-center items-center gap-2"
       >
-        <h1 className="text-6xl font-bold mb-4 text-center text-green-500 glitch-text">CREATE YOUR ONCHAIN ID</h1>
+        <h1 className="text-6xl font-bold mb-4 text-center text-green-500 glitch-text">
+          CREATE YOUR ONCHAIN ID
+        </h1>
         <p className="text-sm text-center max-w-2xl">
-          A cutting-edge application designed to rigorously test and validate your identity through a verification processes
-          that uses TransGate extension and zkPass SDK.
+          A cutting-edge application designed to rigorously test and validate
+          your identity through a verification processes that uses TransGate
+          extension and zkPass SDK.
         </p>
       </motion.div>
 
@@ -181,7 +195,12 @@ export default function Home() {
       </motion.div>
 
       {!ready ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="mt-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mt-8"
+        >
           <div className="w-16 h-16 border-t-4 border-green-500 border-solid rounded-full animate-spin"></div>
         </motion.div>
       ) : (
@@ -193,16 +212,52 @@ export default function Home() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={`${
-              !account.address ? "bg-gray-800 cursor-not-allowed" : "bg-green-500 hover:bg-green-400"
+              !account.address
+                ? "bg-gray-800 cursor-not-allowed"
+                : finished
+                ? "bg-yellow-500 hover:bg-yellow-400"
+                : "bg-green-500 hover:bg-green-400"
             } px-8 py-3 text-black rounded-md font-bold text-lg relative overflow-hidden`}
-            onClick={handleVerify}
+            onClick={
+              finished
+                ? () => {
+                    router.push("/petitions");
+                  }
+                : handleVerify
+            }
             disabled={!account.address}
           >
-            <span className="relative z-10">{glitchText}</span>
+            <span className="relative z-10">
+              {finished ? "Go back" : glitchText}
+            </span>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-full bg-green-300 animate-pulse opacity-75"></div>
+              <div
+                className={`w-full h-full ${
+                  finished ? "bg-yellow-300" : "bg-green-300"
+                } animate-pulse opacity-75`}
+              ></div>
             </div>
           </motion.button>
+
+          {error ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-4 text-red-500"
+            >
+              {error}
+            </motion.div>
+          ) : !error && finished ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-4 text-green-500"
+            >
+              Successfully verified!
+            </motion.div>
+          ) : null}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -211,8 +266,8 @@ export default function Home() {
             className="mt-12 text-sm opacity-75 max-w-md text-center"
           >
             <p>
-              Note: Your identity will be minted encrypted on the Fhenix blockchain right after the verification process is
-              completed.
+              Note: Your identity will be minted encrypted on the Fhenix
+              blockchain right after the verification process is completed.
             </p>
           </motion.div>
         </div>
