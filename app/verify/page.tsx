@@ -1,18 +1,14 @@
 "use client";
 import { verify } from "@/lib/zkpass";
-import { useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { ethers } from "ethers";
 import { AttestationABI } from "@/lib/abi/AttestationABI";
-import { contractAddress } from "@/lib/constants";
+import { contractAddress, mockedData } from "@/lib/constants";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [appId, setAppId] = useState(process.env.NEXT_PUBLIC_APP_ID || "");
-  const [schemaId, setSchemaId] = useState(process.env.NEXT_PUBLIC_SCHEMA_ID || "");
-  const [mintToken, setMintToken] = useState(false);
-  const { authenticated, ready } = usePrivy();
+  const { authenticated, ready, user } = usePrivy();
   const account = useAccount();
   const router = useRouter();
   const { writeContract } = useWriteContract();
@@ -21,20 +17,49 @@ export default function Home() {
   // if the verification goes well and the mintToken checkbox is checked
   const handleVerify = async () => {
     // Verify
-    const { response, message } = await verify(appId, schemaId, account.address);
+    const { response, message } = await verify(
+      process.env.NEXT_PUBLIC_APP_ID!,
+      process.env.NEXT_PUBLIC_SCHEMA_ID!,
+      account.address
+    );
 
     // If the response is null, show an alert with the message
-    if (!response) {
-      alert(message);
+    if (!response && user?.wallet?.address) {
+      //alert(message);
+      try {
+        const hexTaskId = ethers.hexlify(ethers.toUtf8Bytes(mockedData.taskId)) as `0x${string}`; // to hex
+        const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)) as `0x${string}`; // to hex
+
+        const args = {
+          taskId: hexTaskId,
+          schemaId: hexSchemaId,
+          uHash: mockedData.uHash as `0x${string}`,
+          recipient: user.wallet.address as `0x${string}`,
+          publicFieldsHash: mockedData.publicFieldsHash as `0x${string}`,
+          validator: mockedData.validatorAddress as `0x${string}`,
+          allocatorSignature: mockedData.allocatorSignature as `0x${string}`,
+          validatorSignature: mockedData.validatorSignature as `0x${string}`,
+        };
+
+        writeContract({
+          address: contractAddress,
+          abi: AttestationABI,
+          functionName: "attest",
+          args: [args],
+        });
+      } catch (err) {
+        alert(JSON.stringify(err));
+        console.log("error", err);
+      }
       return;
     }
 
     // Log the response and, if the mintToken checkbox is checked, mint a token
     console.log("Transgate response: ", response);
-    if (mintToken && response.recipient) {
+    if (response && response.recipient) {
       try {
         const hexTaskId = ethers.hexlify(ethers.toUtf8Bytes(response.taskId)) as `0x${string}`; // to hex
-        const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(schemaId)) as `0x${string}`; // to hex
+        const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)) as `0x${string}`; // to hex
 
         const args = {
           taskId: hexTaskId,
@@ -74,43 +99,15 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Input fields */}
-      <div className="flex gap-14">
-        <div className="flex gap-3 items-center">
-          <label className="text-md">App ID</label>
-          <input
-            type="text"
-            className="w-96 p-2 border border-gray-300 rounded-md text-black"
-            value={appId}
-            onChange={(e) => setAppId(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-3 items-center">
-          <label className="text-md">Schema ID</label>
-          <input
-            type="text"
-            className="w-96 p-2 border border-gray-300 rounded-md text-black"
-            value={schemaId}
-            onChange={(e) => setSchemaId(e.target.value)}
-          />
-        </div>
-      </div>
-
       {/* Verify button, Connect button and minting checkbox */}
       <div className="flex gap-4 mt-8 items-center">
         <button
-          className={`${
-            !appId || !schemaId || !account.address ? "bg-gray-400" : "bg-yellow-300"
-          } px-5 py-2 text-black rounded-md`}
+          className={`${!account.address ? "bg-gray-400" : "bg-yellow-300"} px-5 py-2 text-black rounded-md`}
           onClick={handleVerify}
-          disabled={!appId || !schemaId || !account.address}
+          disabled={!account.address}
         >
           Verify
         </button>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <input type="checkbox" className="h-5 w-5" checked={mintToken} onChange={(e) => setMintToken(e.target.checked)} />
-        <label>Write the attestation on chain if the verification goes well</label>
       </div>
     </div>
   );

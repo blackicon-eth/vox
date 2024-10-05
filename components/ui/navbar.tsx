@@ -9,14 +9,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu } from "lucide-react";
+import { Menu, Clipboard } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { shortenAddress } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { authenticated, user, logout } = usePrivy();
   const router = useRouter();
+  const pathname = usePathname();
+  const noNavbarRoutes = ["/verify"]; // Add the routes where you don't want the Navbar to appear
+
+  if (noNavbarRoutes.includes(pathname)) {
+    return <div></div>;
+  }
 
   return (
     <nav className="border-b bg-gray-400">
@@ -27,10 +33,10 @@ export default function Navbar() {
           </Link>
           <div className="hidden md:block ml-10">
             <div className="flex items-baseline space-x-4">
-              <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-primary">
+              <Link href="/create" className="text-sm font-medium text-muted-foreground hover:text-primary">
                 Create petition
               </Link>
-              <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-primary">
+              <Link href="/sign" className="text-sm font-medium text-muted-foreground hover:text-primary">
                 Sign a petition
               </Link>
             </div>
@@ -53,7 +59,18 @@ export default function Navbar() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">Address</p>
-                        <p className="text-xs leading-none text-muted-foreground">{shortenAddress(user?.wallet?.address)}</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {shortenAddress(user?.wallet?.address)}
+                          </p>
+                          <button
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(user?.wallet?.address ?? "");
+                            }}
+                          >
+                            <Clipboard height={20} />
+                          </button>
+                        </div>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuItem>
