@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase/supabase";
+import { supabase } from "@/lib/supabase";
 
 export default function CreatePetition() {
   const { ready, authenticated, user } = usePrivy();
@@ -90,9 +90,7 @@ export default function CreatePetition() {
         initial="hidden"
         animate="visible"
       >
-        <h1 className="text-3xl font-bold text-center text-[#4a2c0f] mb-6">
-          Create a New Petition
-        </h1>
+        <h1 className="text-3xl font-bold text-center text-[#4a2c0f] mb-6">Create a New Petition</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="title" className="text-[#4a2c0f]">
@@ -173,10 +171,7 @@ export default function CreatePetition() {
               <FileUp className="w-6 h-6 text-[#8b4513]" />
             </div>
           </div>
-          <Button
-            type="submit"
-            className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
-          >
+          <Button type="submit" className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]">
             Create Petition
           </Button>
         </form>
