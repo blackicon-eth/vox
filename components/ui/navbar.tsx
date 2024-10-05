@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,36 +10,84 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Clipboard } from "lucide-react";
+import { Menu, Clipboard, Feather } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { shortenAddress } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
   const { authenticated, user, logout } = usePrivy();
   const router = useRouter();
   const pathname = usePathname();
-  const noNavbarRoutes = ["/verify"]; // Add the routes where you don't want the Navbar to appear
+  const noNavbarRoutes = ["/verify"];
 
   if (noNavbarRoutes.includes(pathname)) {
     return <div></div>;
   }
 
+  const navbarVariants = {
+    hidden: { opacity: 0, y: -50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const linkVariants = {
+    hover: {
+      scale: 1.05,
+      transition: {
+        duration: 0.2,
+        yoyo: Infinity,
+      },
+    },
+  };
+
   return (
-    <nav className="border-b bg-gray-400">
-      <div className="flex items-center justify-between h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <motion.nav
+      className="border-b border-[#8b4513] bg-[#d3c7a2] shadow-md"
+      style={{
+        backgroundImage: "url('/paper-texture-2.jpg')",
+        backgroundBlendMode: "multiply",
+      }}
+      variants={navbarVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="flex items-center justify-between h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link href="/" className="flex-shrink-0">
-            <span className="text-2xl font-bold text-primary">Vox</span>
+            <motion.span
+              className="text-3xl font-bold text-[#4a2c0f] font-serif flex items-center"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Feather className="w-8 h-8 mr-2" />
+              Vox
+            </motion.span>
           </Link>
           <div className="hidden md:block ml-10">
             <div className="flex items-baseline space-x-4">
-              <Link href="/create" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Create petition
-              </Link>
-              <Link href="/sign" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Sign a petition
-              </Link>
+              <motion.div variants={linkVariants} whileHover="hover">
+                <Link
+                  href="/create"
+                  className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
+                >
+                  Create petition
+                </Link>
+              </motion.div>
+              <motion.div variants={linkVariants} whileHover="hover">
+                <Link
+                  href="/sign"
+                  className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
+                >
+                  Sign a petition
+                </Link>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -48,27 +97,29 @@ export default function Navbar() {
               <div className="flex items-center">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
+                    <Button
+                      variant="ghost"
+                      className="relative h-12 w-12 rounded-full border-2 border-[#8b4513] hover:bg-[#c4b17e] transition-colors duration-200"
+                    >
+                      <Avatar className="h-10 w-10">
                         <AvatarImage src="/avatars/01.png" alt="@shadcn" />
                         <AvatarFallback>SC</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-40" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-[#f0e7d8] border-2 border-[#8b4513]" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">Address</p>
+                        <p className="text-sm font-medium leading-none text-[#4a2c0f]">Address</p>
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs leading-none text-muted-foreground">
-                            {shortenAddress(user?.wallet?.address)}
-                          </p>
+                          <p className="text-xs leading-none text-[#5e3a1a]">{shortenAddress(user?.wallet?.address)}</p>
                           <button
                             onClick={async () => {
                               await navigator.clipboard.writeText(user?.wallet?.address ?? "");
                             }}
+                            className="text-[#8b4513] hover:text-[#6e3710] transition-colors duration-200"
                           >
-                            <Clipboard height={20} />
+                            <Clipboard height={16} />
                           </button>
                         </div>
                       </div>
@@ -79,6 +130,7 @@ export default function Navbar() {
                           await logout();
                           router.push("/");
                         }}
+                        className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8] transition-colors duration-200"
                       >
                         Log out
                       </Button>
@@ -88,7 +140,11 @@ export default function Navbar() {
               </div>
             </div>
             <div className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-[#8b4513] hover:bg-[#c4b17e] transition-colors duration-200"
+              >
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open main menu</span>
               </Button>
@@ -96,6 +152,6 @@ export default function Navbar() {
           </div>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 }

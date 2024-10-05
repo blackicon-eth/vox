@@ -1,8 +1,10 @@
 "use client";
-import { LoadingSpinner } from "@/components/ui/loadingSpinner";
+
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { Loader2, Feather } from "lucide-react";
 
 export default function Home() {
   const { ready, authenticated, login } = usePrivy();
@@ -14,28 +16,98 @@ export default function Home() {
     }
   }, [authenticated, router]);
 
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        delay: 0.2,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const titleVariants = {
+    hidden: { y: -20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        delay: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const buttonVariants = {
+    hover: {
+      scale: 1.05,
+      transition: {
+        duration: 0.2,
+        yoyo: Infinity,
+      },
+    },
+  };
+
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen gap-16 font-[family-name:var(--font-geist-sans)]">
-      {!ready ? (
-        <LoadingSpinner />
-      ) : ready && !authenticated ? (
-        <div className="flex flex-col justify-center items-center gap-8 p-8 bg-gray-800 rounded-md">
-          <div className="flex flex-col justify-center items-center gap-2">
-            <h1 className="text-4xl font-bold text-center text-wrap text-white">Welcome to the Vox app ✒️</h1>
-            <div className="text-white text-md text-center">
-              Create and sign reliable petitions in a totally anonymous way
-            </div>
-          </div>
-          <button
-            className="flex bg-violet-600 hover:bg-violet-700 py-3 px-10 text-white rounded-lg text-lg"
-            onClick={login}
+    <div className="flex flex-col h-full items-center justify-center bg-[#f0e7d8] font-serif">
+      <motion.div
+        className="relative w-full max-w-2xl p-12 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
+        style={{
+          backgroundImage: "url('/paper-texture-2.jpg')",
+          backgroundBlendMode: "multiply",
+        }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div
+          className="absolute top-0 left-0 w-full h-2 bg-[#8b4513]"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 1 }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-0 w-full h-2 bg-[#8b4513]"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 1 }}
+        />
+
+        {!ready ? (
+          <motion.div
+            className="flex justify-center items-center h-64"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            Log in
-          </button>
-        </div>
-      ) : (
-        <div></div>
-      )}
+            <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
+          </motion.div>
+        ) : ready && !authenticated ? (
+          <div className="flex flex-col justify-center items-center gap-8">
+            <motion.div className="flex flex-col justify-center items-center gap-4" variants={titleVariants}>
+              <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">Welcome to the Vox app</h1>
+              <Feather className="w-12 h-12 text-[#8b4513]" />
+              <p className="text-lg text-center text-[#5e3a1a]">
+                Create and sign reliable petitions in a totally anonymous way
+              </p>
+            </motion.div>
+            <motion.button
+              className="flex items-center justify-center bg-[#8b4513] hover:bg-[#6e3710] py-3 px-10 text-[#f0e7d8] rounded-lg text-lg font-semibold shadow-md"
+              onClick={login}
+              variants={buttonVariants}
+              whileHover="hover"
+            >
+              Log in
+            </motion.button>
+          </div>
+        ) : (
+          <div></div>
+        )}
+      </motion.div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function Home() {
 
   if (!ready) {
     return (
-      <div className="flex flex-col items-center justify-start min-h-screen gap-16 font-[family-name:var(--font-geist-sans)]">
+      <div className="flex flex-col items-center justify-start min-h-screen p-20 gap-16 font-[family-name:var(--font-geist-sans)]">
         <LoadingSpinner />
       </div>
     );
@@ -24,7 +24,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen gap-16 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col items-center justify-center min-h-screen p-20 gap-16 font-[family-name:var(--font-geist-sans)]">
       {!hasIdentity ? (
         <div className="flex flex-col justify-center items-center gap-4">
           <div>You need to verify yourself first</div>
