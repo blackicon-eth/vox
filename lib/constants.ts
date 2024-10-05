@@ -1,6 +1,5 @@
-// Sepolia Attestation contract address
-// You can add Sepolia chain from https://chainlist.org/?search=11155111&testnets=true
-export const contractAddress = "0x82E1c3aFa1296567657C834846631645b222644f";
+// Contract to check if the user has an attestation of identity onchain
+export const identityContract = "0x82E1c3aFa1296567657C834846631645b222644f";
 
 // The zkPass allocator address
 export const allocatorAddress = "0x19a567b3b212a5b35bA0E3B600FbEd5c2eE9083d"; // TODO: change this with the correct address
@@ -17,16 +16,16 @@ export const mockedData = {
           nome: "Matteo",
           cognome: "Rossi",
           username: "MTORSS77C15H501Z",
-          dataNascita: "1977-10-05"
+          dataNascita: "1977-10-05",
         },
       },
     },
   ],
-  publicFieldsHash: "0x42b440a4cfba2b82385dc8c470fec652b7b717fcc82d8bda51c8af86a0468177",
+  publicFieldsHash:
+    "0x42b440a4cfba2b82385dc8c470fec652b7b717fcc82d8bda51c8af86a0468177",
   taskId: "a3555ce1ad334614bd9849c7a2ceb84c",
   uHash: "0x6a7b79e79a88a7302e4c1fbb1e8dae52c2a7663a132c809609435a728d2221ba",
   validatorAddress: "0xb1C4C1E1Cdd5Cf69E27A3A08C8f51145c2E12C6a",
-  validatorSignature: "0x573903f348acff227aa4b910dfd264985813083d1294bc0a97b49c6e28b36a882cc64a54ffac9d092fe52971857e1d689d8f723ee81f020ae47d0511667e1a691c",
+  validatorSignature:
+    "0x573903f348acff227aa4b910dfd264985813083d1294bc0a97b49c6e28b36a882cc64a54ffac9d092fe52971857e1d689d8f723ee81f020ae47d0511667e1a691c",
 };
-
-

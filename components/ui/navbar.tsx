@@ -50,7 +50,7 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className="border-b border-[#8b4513] bg-[#d3c7a2] shadow-md"
+      className="border-b border-[#8b4513] bg-[#d3c7a2] shadow-md fixed top-0 left-0 w-full z-50"
       style={{
         backgroundImage: "url('/background/paper-texture-2.jpg')",
         backgroundBlendMode: "multiply",
