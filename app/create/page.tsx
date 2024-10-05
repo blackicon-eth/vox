@@ -79,18 +79,20 @@ export default function CreatePetition() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] font-serif p-4">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] p-4">
       <motion.div
         className="w-full max-w-2xl p-8 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
         style={{
-          backgroundImage: "url('/paper-texture-2.jpg')",
+          backgroundImage: "url('/background/paper-texture-2.jpg')",
           backgroundBlendMode: "multiply",
         }}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <h1 className="text-3xl font-bold text-center text-[#4a2c0f] mb-6">Create a New Petition</h1>
+        <h1 className="text-3xl font-bold text-center text-[#4a2c0f] mb-6">
+          Create a New Petition
+        </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="title" className="text-[#4a2c0f]">
@@ -171,7 +173,10 @@ export default function CreatePetition() {
               <FileUp className="w-6 h-6 text-[#8b4513]" />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]">
+          <Button
+            type="submit"
+            className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
+          >
             Create Petition
           </Button>
         </form>

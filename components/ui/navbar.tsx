@@ -63,7 +63,7 @@ export default function Navbar() {
         <div className="flex items-center">
           <Link href="/" className="flex-shrink-0">
             <motion.span
-              className="text-3xl font-bold text-[#4a2c0f] font-serif flex items-center"
+              className="text-3xl font-bold text-[#4a2c0f] flex items-center"
               whileHover={{ scale: 1.05 }}
             >
               <Feather className="w-8 h-8 mr-2" />
@@ -74,18 +74,18 @@ export default function Navbar() {
             <div className="flex items-baseline space-x-4">
               <motion.div variants={linkVariants} whileHover="hover">
                 <Link
-                  href="/create"
+                  href="/my-petitions"
                   className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
                 >
-                  Create petition
+                  My petitions
                 </Link>
               </motion.div>
               <motion.div variants={linkVariants} whileHover="hover">
                 <Link
-                  href="/sign"
+                  href="/petitions"
                   className="text-lg font-medium text-[#5e3a1a] hover:text-[#8b4513] transition-colors duration-200"
                 >
-                  Sign a petition
+                  All petitons
                 </Link>
               </motion.div>
             </div>
@@ -102,20 +102,34 @@ export default function Navbar() {
                       className="relative h-12 w-12 rounded-full border-2 border-[#8b4513] hover:bg-[#c4b17e] transition-colors duration-200"
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage className="bg-yellow-100" src="/avatars/feather.png" alt="@shadcn" />
+                        <AvatarImage
+                          className="bg-yellow-100"
+                          src="/avatars/feather.png"
+                          alt="@shadcn"
+                        />
                         <AvatarFallback>SC</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-[#f0e7d8] border-2 border-[#8b4513]" align="end" forceMount>
+                  <DropdownMenuContent
+                    className="w-56 bg-[#f0e7d8] border-2 border-[#8b4513]"
+                    align="end"
+                    forceMount
+                  >
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none text-[#4a2c0f]">Address</p>
+                        <p className="text-sm font-medium leading-none text-[#4a2c0f]">
+                          Address
+                        </p>
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs leading-none text-[#5e3a1a]">{shortenAddress(user?.wallet?.address)}</p>
+                          <p className="text-xs leading-none text-[#5e3a1a]">
+                            {shortenAddress(user?.wallet?.address)}
+                          </p>
                           <button
                             onClick={async () => {
-                              await navigator.clipboard.writeText(user?.wallet?.address ?? "");
+                              await navigator.clipboard.writeText(
+                                user?.wallet?.address ?? ""
+                              );
                             }}
                             className="text-[#8b4513] hover:text-[#6e3710] transition-colors duration-200"
                           >

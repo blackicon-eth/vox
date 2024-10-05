@@ -70,7 +70,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col h-full items-center justify-start pt-10 bg-[#f0e7d8] font-serif">
+    <div className="flex flex-col h-full items-center justify-start pt-10 bg-[#f0e7d8]">
       <motion.div
         className="relative w-full max-w-2xl p-12 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
         style={{
@@ -94,8 +94,13 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 1 }}
         />
         <div className="flex flex-col justify-center items-center gap-8">
-          <motion.div className="flex flex-col justify-center items-center gap-4" variants={titleVariants}>
-            <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">Welcome to the Vox app</h1>
+          <motion.div
+            className="flex flex-col justify-center items-center gap-4"
+            variants={titleVariants}
+          >
+            <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">
+              Welcome to the Vox app
+            </h1>
             <Feather className="w-12 h-12 text-[#8b4513]" />
             <p className="text-lg text-center text-[#5e3a1a]">
               Create and sign reliable petitions in a totally anonymous way

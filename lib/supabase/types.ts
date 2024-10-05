@@ -6,6 +6,7 @@ export interface Petition {
   extendeddescription: string;
   enddate: string;
   goal: number;
+  votes?: number; // Updated property name
 }
 
 export interface Vote {

@@ -76,17 +76,17 @@ export default function PetitionList() {
     const { data, error, count } = await supabase
       .from("petition")
       .select("*", { count: "exact" })
+      .eq("creator", user?.wallet?.address.toString()) // filter rows where creator equals myAddress
       .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
     if (error) {
       console.error("Error fetching petitions:", error);
     } else {
-      console.log("Fetched petitions:", data);
       setPetitions(data || []);
       setTotalPages(Math.ceil((count || 0) / itemsPerPage));
     }
     setLoading(false);
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage, user?.wallet?.address]);
 
   useEffect(() => {
     fetchPetitions();
