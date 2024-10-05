@@ -35,7 +35,6 @@ export default function CreatePetition() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log(user?.wallet?.address.toString());
     e.preventDefault();
 
     if (!user || !user.wallet?.address) {
