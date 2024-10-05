@@ -20,33 +20,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
 import { usePrivy } from "@privy-io/react-auth";
 import { Petition } from "@/lib/supabase/types";
 import { shortenAddress } from "@/lib/utils";
-
-const mockedPetitions: Petition[] = [
-  {
-    id: 1,
-    creator: "John Doe",
-    name: "Save the Rainforest",
-    description: "A petition to save the rainforest from deforestation.",
-    extendeddescription:
-      "The rainforest is home to many species of plants and animals.",
-    enddate: "2023-12-31",
-    goal: 1000,
-  },
-  {
-    id: 2,
-    creator: "Jane Smith",
-    name: "Protect Ocean Life",
-    description: "A petition to protect ocean life from pollution.",
-    extendeddescription:
-      "The ocean is home to many species of fish and other marine life.",
-    enddate: "2023-11-30",
-    goal: 2000,
-  },
-];
 
 export default function PetitionList() {
   const [petitions, setPetitions] = useState<Petition[]>([]);
@@ -56,47 +35,58 @@ export default function PetitionList() {
   const [selectedPetition, setSelectedPetition] = useState<Petition | null>(
     null
   );
+  const [showUserPetitions, setShowUserPetitions] = useState(false);
   const { ready, authenticated, user } = usePrivy();
   const router = useRouter();
 
   const itemsPerPage = 10;
 
-  const fetchMockedPetitions = useCallback(async () => {
-    setLoading(true);
-    // Simulate fetching data
-    setTimeout(() => {
-      setPetitions(mockedPetitions);
-      setTotalPages(1);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
   const fetchPetitions = useCallback(async () => {
+    if (!authenticated) return;
+
     setLoading(true);
-    const { data, error, count } = await supabase
-      .from("petition")
-      .select("*", { count: "exact" })
-      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+    let query = supabase.from("petition").select("*", { count: "exact" });
+
+    if (showUserPetitions && user?.wallet?.address) {
+      query = query.eq("creator", user.wallet.address.toString());
+    }
+
+    const { data, error, count } = await query.range(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage - 1
+    );
 
     if (error) {
       console.error("Error fetching petitions:", error);
     } else {
-      console.log("Fetched petitions:", data);
       setPetitions(data || []);
       setTotalPages(Math.ceil((count || 0) / itemsPerPage));
     }
     setLoading(false);
-  }, [currentPage, itemsPerPage]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    showUserPetitions,
+    authenticated,
+    user?.wallet?.address,
+  ]);
 
   useEffect(() => {
-    fetchPetitions();
-  }, [currentPage, fetchPetitions]);
+    if (authenticated) {
+      fetchPetitions();
+    }
+  }, [authenticated, currentPage, fetchPetitions, showUserPetitions]);
 
   if (!ready) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[#f0e7d8]">
+      <motion.div
+        className="flex justify-center items-center h-screen bg-[#f0e7d8]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
-      </div>
+      </motion.div>
     );
   }
 
@@ -128,19 +118,6 @@ export default function PetitionList() {
     },
   };
 
-  if (loading) {
-    return (
-      <motion.div
-        className="flex justify-center items-center h-screen bg-[#f0e7d8]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
-      </motion.div>
-    );
-  }
-
   return (
     <motion.div
       className="min-h-screen bg-[#f0e7d8] p-8"
@@ -158,48 +135,73 @@ export default function PetitionList() {
       >
         <div className="p-6">
           <h1 className="text-3xl font-bold text-center text-[#4a2c0f] mb-6">
-            Active Petitions
+            {showUserPetitions ? "My Petitions" : "Active Petitions"}
           </h1>
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[#4a2c0f] text-xl">Name</TableHead>
-                <TableHead className="text-[#4a2c0f] text-xl">
-                  Creator
-                </TableHead>
-                <TableHead className="text-[#4a2c0f] text-xl">
-                  End Date
-                </TableHead>
-                <TableHead className="text-[#4a2c0f] text-xl">
-                  Signatures Goal
-                </TableHead>
-                <TableHead className="text-[#4a2c0f] text-xl">Signed</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {petitions.map((petition) => (
-                <TableRow
-                  key={petition.id}
-                  onClick={() => setSelectedPetition(petition)}
-                  className="cursor-pointer hover:bg-[rgba(229,231,235,0.5)]"
-                >
-                  <TableCell className="text-[#5e3a1a] text-md">
-                    {petition.name}
-                  </TableCell>
-                  <TableCell className="text-[#5e3a1a] text-md">
-                    {shortenAddress(petition.creator)}
-                  </TableCell>
-                  <TableCell className="text-[#5e3a1a] text-md">
-                    {new Date(petition.enddate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-[#5e3a1a] text-md">
-                    {petition.goal}
-                  </TableCell>
-                  <TableCell className="text-[#5e3a1a] text-md">Yes</TableCell>
+          <div className="flex justify-end mb-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="user-petitions"
+                checked={showUserPetitions}
+                onCheckedChange={setShowUserPetitions}
+              />
+              <Label htmlFor="user-petitions">Show only my petitions</Label>
+            </div>
+          </div>
+          {loading ? (
+            <motion.div
+              className="flex justify-center items-center h-64"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
+            </motion.div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="text-[#4a2c0f] text-xl">Name</TableHead>
+                  <TableHead className="text-[#4a2c0f] text-xl">
+                    Creator
+                  </TableHead>
+                  <TableHead className="text-[#4a2c0f] text-xl">
+                    End Date
+                  </TableHead>
+                  <TableHead className="text-[#4a2c0f] text-xl">
+                    Signatures Goal
+                  </TableHead>
+                  <TableHead className="text-[#4a2c0f] text-xl">
+                    Current Signatures
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {petitions.map((petition) => (
+                  <TableRow
+                    key={petition.id}
+                    onClick={() => setSelectedPetition(petition)}
+                    className="cursor-pointer hover:bg-[rgba(229,231,235,0.5)]"
+                  >
+                    <TableCell className="text-[#5e3a1a] text-md">
+                      {petition.name}
+                    </TableCell>
+                    <TableCell className="text-[#5e3a1a] text-md">
+                      {shortenAddress(petition.creator)}
+                    </TableCell>
+                    <TableCell className="text-[#5e3a1a] text-md">
+                      {new Date(petition.enddate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-[#5e3a1a] text-md">
+                      {petition.goal}
+                    </TableCell>
+                    <TableCell className="text-[#5e3a1a] text-md">
+                      {petition.votes || 0}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
         <div className="flex justify-between items-center py-2 px-4 bg-[#8b4513] text-[#f0e7d8]">
           <Button
@@ -260,20 +262,43 @@ export default function PetitionList() {
                 <p>
                   <strong>Signatures Goal:</strong> {selectedPetition.goal}
                 </p>
+                <p>
+                  <strong>Current Signatures:</strong>{" "}
+                  {selectedPetition.votes || 0}
+                </p>
               </div>
               <DialogFooter>
-                <Button
-                  onClick={() => console.log("Sign anonymously")}
-                  className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
-                >
-                  Sign Anonymously
-                </Button>
-                <Button
-                  onClick={() => console.log("Sign as doxxed")}
-                  className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
-                >
-                  Sign as Doxxed
-                </Button>
+                {selectedPetition.creator === user?.wallet?.address ? (
+                  <>
+                    <Button
+                      onClick={() => console.log("Edit petition")}
+                      className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
+                    >
+                      Edit Petition
+                    </Button>
+                    <Button
+                      onClick={() => console.log("Delete petition")}
+                      className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
+                    >
+                      Delete Petition
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => console.log("Sign anonymously")}
+                      className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
+                    >
+                      Sign Anonymously
+                    </Button>
+                    <Button
+                      onClick={() => console.log("Sign as doxxed")}
+                      className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
+                    >
+                      Sign as Doxxed
+                    </Button>
+                  </>
+                )}
               </DialogFooter>
             </DialogContent>
           </Dialog>

@@ -58,14 +58,29 @@ export default function Home() {
           validator: mockedData.validatorAddress as `0x${string}`,
           allocatorSignature: mockedData.allocatorSignature as `0x${string}`,
           validatorSignature: mockedData.validatorSignature as `0x${string}`,
+          publicFields: mockedData.publicFields,
+          embeddedAddress:  account.address,
         };
-
-        writeContract({
-          address: contractAddress,
-          abi: AttestationABI,
-          functionName: "attest",
-          args: [args],
-        });
+        
+        try {
+          const res = await fetch("/api/send-cyphertext", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: args,
+            }),
+          });
+    
+          if (!res.ok) {
+            const error = await res.text();
+            throw new Error(`Failed to send ciphertext: ${error}`);
+          }
+        } catch (error: any){
+          console.log(error.message);
+        }
+      
       } catch (err) {
         alert(JSON.stringify(err));
         console.log("error", err);
@@ -79,7 +94,6 @@ export default function Home() {
       try {
         const hexTaskId = ethers.hexlify(ethers.toUtf8Bytes(response.taskId)) as `0x${string}`;
         const hexSchemaId = ethers.hexlify(ethers.toUtf8Bytes(process.env.NEXT_PUBLIC_SCHEMA_ID!)) as `0x${string}`;
-
         const args = {
           taskId: hexTaskId,
           schemaId: hexSchemaId,
@@ -89,14 +103,30 @@ export default function Home() {
           validator: response.validatorAddress,
           allocatorSignature: response.allocatorSignature,
           validatorSignature: response.validatorSignature,
+          publicFields: response.publicFields,
+          embeddedAddress:  account.address,
         };
 
-        writeContract({
-          address: contractAddress,
-          abi: AttestationABI,
-          functionName: "attest",
-          args: [args],
-        });
+        try {
+          const res = await fetch("/api/send-cyphertext", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: args,
+            }),
+          });
+    
+          if (!res.ok) {
+            const error = await res.text();
+            throw new Error(`Failed to send ciphertext: ${error}`);
+          }
+        } catch (error: any){
+          console.log(error.message);
+        }
+   
+
       } catch (err) {
         alert(JSON.stringify(err));
         console.log("error", err);
