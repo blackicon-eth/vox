@@ -52,8 +52,25 @@ export default function Home() {
     },
   };
 
+  if (!ready) {
+    return (
+      <motion.div
+        className="flex justify-center items-center h-64"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
+      </motion.div>
+    );
+  }
+
+  if (authenticated) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col h-full items-center justify-center bg-[#f0e7d8] font-serif">
+    <div className="flex flex-col h-full items-center justify-start pt-10 bg-[#f0e7d8] font-serif">
       <motion.div
         className="relative w-full max-w-2xl p-12 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
         style={{
@@ -76,37 +93,23 @@ export default function Home() {
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
         />
-
-        {!ready ? (
-          <motion.div
-            className="flex justify-center items-center h-64"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <Loader2 className="w-12 h-12 text-[#8b4513] animate-spin" />
+        <div className="flex flex-col justify-center items-center gap-8">
+          <motion.div className="flex flex-col justify-center items-center gap-4" variants={titleVariants}>
+            <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">Welcome to the Vox app</h1>
+            <Feather className="w-12 h-12 text-[#8b4513]" />
+            <p className="text-lg text-center text-[#5e3a1a]">
+              Create and sign reliable petitions in a totally anonymous way
+            </p>
           </motion.div>
-        ) : ready && !authenticated ? (
-          <div className="flex flex-col justify-center items-center gap-8">
-            <motion.div className="flex flex-col justify-center items-center gap-4" variants={titleVariants}>
-              <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">Welcome to the Vox app</h1>
-              <Feather className="w-12 h-12 text-[#8b4513]" />
-              <p className="text-lg text-center text-[#5e3a1a]">
-                Create and sign reliable petitions in a totally anonymous way
-              </p>
-            </motion.div>
-            <motion.button
-              className="flex items-center justify-center bg-[#8b4513] hover:bg-[#6e3710] py-3 px-10 text-[#f0e7d8] rounded-lg text-lg font-semibold shadow-md"
-              onClick={login}
-              variants={buttonVariants}
-              whileHover="hover"
-            >
-              Log in
-            </motion.button>
-          </div>
-        ) : (
-          <div></div>
-        )}
+          <motion.button
+            className="flex items-center justify-center bg-[#8b4513] hover:bg-[#6e3710] py-3 px-10 text-[#f0e7d8] rounded-lg text-lg font-semibold shadow-md"
+            onClick={login}
+            variants={buttonVariants}
+            whileHover="hover"
+          >
+            Log in
+          </motion.button>
+        </div>
       </motion.div>
     </div>
   );
