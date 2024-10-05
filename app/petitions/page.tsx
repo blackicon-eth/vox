@@ -269,7 +269,7 @@ export default function PetitionList() {
               </div>
               <DialogFooter>
                 {selectedPetition.creator === user?.wallet?.address ? (
-                  <>
+                  <div>
                     <Button
                       onClick={() => console.log("Edit petition")}
                       className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
@@ -282,9 +282,9 @@ export default function PetitionList() {
                     >
                       Delete Petition
                     </Button>
-                  </>
+                  </div>
                 ) : (
-                  <>
+                  <div>
                     <Button
                       onClick={() => console.log("Sign anonymously")}
                       className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
@@ -297,7 +297,7 @@ export default function PetitionList() {
                     >
                       Sign as Doxxed
                     </Button>
-                  </>
+                  </div>
                 )}
               </DialogFooter>
             </DialogContent>
