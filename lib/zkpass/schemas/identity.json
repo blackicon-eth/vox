@@ -1,0 +1,26 @@
+{
+  "issuer": "ANPR",
+  "desc": "A very big and italian data borner.",
+  "website": "https://sc.anpr.interno.it/serviziCittadino/home",
+  "APIs": [
+    {
+      "host": "sc.anpr.interno.it",
+      "intercept": {
+        "url": "api-home/jaxrs/auth/user/check_login",
+        "method": "GET"
+      },
+      "assert": [
+        {
+          "key": "content|usernameSigner",
+          "value": "SPIDUser",
+          "operation": "="
+        }
+      ],
+      "nullifier": "content|username"
+    }
+  ],
+  "HRCondition": ["ANPR"],
+  "tips": {
+    "message": "Log in into your ANPR account and then click the 'Start' button to initiate the verification process."
+  }
+}
