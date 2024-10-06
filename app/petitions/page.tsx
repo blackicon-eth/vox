@@ -26,6 +26,7 @@ import { supabase } from "@/lib/supabase";
 import { usePrivy } from "@privy-io/react-auth";
 import { Petition } from "@/lib/supabase/types";
 import { hasUserIdentity, shortenAddress } from "@/lib/utils";
+import { VotesChart } from "../../components/ui/petition-radial-chart";
 
 export default function PetitionList() {
   const [petitions, setPetitions] = useState<Petition[]>([]);
@@ -151,7 +152,7 @@ export default function PetitionList() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] p-4 my-16">
-      {hasIdentity ? (
+      {!hasIdentity ? (
         <motion.div
           className="min-h-screen bg-[#f0e7d8] p-8"
           variants={containerVariants}
@@ -270,40 +271,48 @@ export default function PetitionList() {
                 onOpenChange={() => setSelectedPetition(null)}
               >
                 <DialogContent
-                  className="bg-[#d3c7a2] text-[#4a2c0f]"
+                  className="bg-transparent text-[#4a2c0f] max-w-4xl p-0 border-none"
                   style={{
                     backgroundImage: "url('/background/paper-texture-2.jpg')",
                     backgroundBlendMode: "multiply",
                   }}
                 >
-                  <DialogHeader>
+                  <DialogHeader className="p-6">
                     <DialogTitle>{selectedPetition.name}</DialogTitle>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <p>
-                      <strong>Creator:</strong> {selectedPetition.creator}
-                    </p>
-                    <p>
-                      <strong>Description:</strong>{" "}
-                      {selectedPetition.description}
-                    </p>
-                    <p>
-                      <strong>Extended Description:</strong>{" "}
-                      {selectedPetition.extendeddescription}
-                    </p>
-                    <p>
-                      <strong>End Date:</strong>{" "}
-                      {new Date(selectedPetition.enddate).toLocaleDateString()}
-                    </p>
-                    <p>
-                      <strong>Signatures Goal:</strong> {selectedPetition.goal}
-                    </p>
-                    <p>
-                      <strong>Current Signatures:</strong>{" "}
-                      {selectedPetition.votes || 0}
-                    </p>
+                  <div className="flex p-6 pt-0">
+                    <div className="flex-grow grid gap-4 pr-6">
+                      <p>
+                        <strong>Creator:</strong> {selectedPetition.creator}
+                      </p>
+                      <p>
+                        <strong>Description:</strong>{" "}
+                        {selectedPetition.description}
+                      </p>
+                      <p>
+                        <strong>Extended Description:</strong>{" "}
+                        {selectedPetition.extendeddescription}
+                      </p>
+                      <p>
+                        <strong>End Date:</strong>{" "}
+                        {new Date(
+                          selectedPetition.enddate
+                        ).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <strong>Signatures Goal:</strong>{" "}
+                        {selectedPetition.goal}
+                      </p>
+                      <p>
+                        <strong>Current Signatures:</strong>{" "}
+                        {selectedPetition.votes || 0}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 w-[250px]">
+                      <VotesChart />
+                    </div>
                   </div>
-                  <DialogFooter>
+                  <DialogFooter className="p-6">
                     {selectedPetition.creator ===
                     user?.wallet?.address ? null : (
                       <div className="flex justify-center items-center gap-3">

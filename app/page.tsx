@@ -99,11 +99,15 @@ export default function Home() {
             variants={titleVariants}
           >
             <h1 className="text-4xl font-bold text-center text-[#4a2c0f] leading-tight">
-              Welcome to the Vox app
+              Vox Populi, Vox Dei
             </h1>
+            <p className="text-sm text-center text-[#5e3a1a]">
+              the voice of the people (is) the voice of God
+            </p>
             <Feather className="w-12 h-12 text-[#8b4513]" />
             <p className="text-lg text-center text-[#5e3a1a]">
-              Create and sign reliable petitions in a totally anonymous way
+              Welcome to Vox, a private, secure and sybil-resistant petition
+              platform
             </p>
           </motion.div>
           <motion.button
