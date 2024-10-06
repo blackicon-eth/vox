@@ -71,7 +71,7 @@ export default function Navbar() {
             </motion.span>
           </Link>
           <div className="hidden md:block ml-10">
-            <div className="flex items-baseline space-x-4">
+            <div className="flex items-baseline space-x-9">
               <motion.div variants={linkVariants} whileHover="hover">
                 <Link
                   href="/petitions"
