@@ -152,7 +152,7 @@ export default function PetitionList() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] p-4 my-16">
-      {!hasIdentity ? (
+      {hasIdentity ? (
         <motion.div
           className="min-h-screen bg-[#f0e7d8] p-8"
           variants={containerVariants}

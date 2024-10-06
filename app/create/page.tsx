@@ -121,7 +121,7 @@ export default function CreatePetition() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] p-4 my-14">
-      {!hasIdentity ? (
+      {hasIdentity ? (
         <motion.div
           className="w-full max-w-2xl p-8 bg-[#d3c7a2] rounded-lg shadow-2xl overflow-hidden"
           style={{
