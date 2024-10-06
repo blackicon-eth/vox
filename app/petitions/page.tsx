@@ -31,7 +31,6 @@ import { LoadingSpinner } from "@/components/ui/loadingSpinner";
 
 export default function PetitionList() {
   const [petitions, setPetitions] = useState<Petition[]>([]);
-  const [hasVoted, setHasVoted] = useState(false);
   const [hasIdentity, setHasIdentity] = useState(false);
   const [loading, setLoading] = useState(true);
   const [signLoading, setSignLoading] = useState(false);
@@ -42,10 +41,29 @@ export default function PetitionList() {
     null
   );
   const [showUserPetitions, setShowUserPetitions] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false); // New state for vote status
   const { ready, authenticated, user } = usePrivy();
   const router = useRouter();
 
   const itemsPerPage = 15;
+
+  const checkHasVoted = async (
+    address: string | undefined,
+    petitionId: string
+  ) => {
+    const { data, error } = await supabase
+      .from("vote")
+      .select("*")
+      .eq("signer", address || "")
+      .eq("petiton", petitionId);
+    if (error) {
+      console.error("Error fetching votes:", error);
+      return false;
+    } else {
+      console.log("Votes:", data);
+      return data?.length > 0;
+    }
+  };
 
   const fetchPetitions = useCallback(async () => {
     if (!authenticated) return;
@@ -85,23 +103,8 @@ export default function PetitionList() {
           setHasIdentity(identity);
         }
       };
-      const checkHasVoted = async () => {
-        if (user && user.wallet?.address) {
-          const { data, error } = await supabase
-            .from("vote")
-            .select("*")
-            .eq("signer", user.wallet.address.toString() || "");
-          if (error) {
-            console.error("Error fetching votes:", error);
-            setHasVoted(false);
-          } else {
-            setHasVoted(data?.length > 0);
-          }
-        }
-      };
       fetchPetitions();
       checkIdentity();
-      checkHasVoted();
     }
   }, [authenticated, currentPage, fetchPetitions, showUserPetitions, user]);
 
@@ -114,36 +117,37 @@ export default function PetitionList() {
       return;
     }
 
-    try {
-      const args = {
-        petitionId: selectedPetition?.id,
-        voter: user.wallet.address,
-      };
-      const res = await fetch("/api/vote", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data: args,
-        }),
-      });
+    // try {
+    //   const args = {
+    //     petitionId: selectedPetition?.id,
+    //     voter: user.wallet.address,
+    //   };
+    //   const res = await fetch("/api/vote", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       data: args,
+    //     }),
+    //   });
 
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error(`Failed to write petition onchain: ${error}`);
-      }
-    } catch (error: any) {
-      console.log(error.message);
-      setSignLoading(false);
-      return;
-    }
+    //   if (!res.ok) {
+    //     const error = await res.text();
+    //     throw new Error(`Failed to write petition onchain: ${error}`);
+    //   }
+    // } catch (error: any) {
+    //   console.log(error.message);
+    //   setSignLoading(false);
+    //   return;
+    // }
 
     try {
       const { data, error } = await supabase.from("vote").insert([
         {
           signer: user.wallet.address,
           permit: false,
+          petiton: selectedPetition?.id,
         },
       ]);
 
@@ -166,7 +170,6 @@ export default function PetitionList() {
         console.log("Data updated successfully:", data2);
         setSignLoading(false);
         setSuccess(true);
-        // You might want to redirect the user or show a success message here
         router.push("/petitions");
       }
     } catch (error) {
@@ -174,6 +177,19 @@ export default function PetitionList() {
       console.error("Unexpected error:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchVoteStatus = async () => {
+      if (selectedPetition && user?.wallet?.address) {
+        const voted = await checkHasVoted(
+          user.wallet.address,
+          selectedPetition.id.toString()
+        );
+        setHasVoted(voted);
+      }
+    };
+    fetchVoteStatus();
+  }, [selectedPetition, user]);
 
   if (!ready || loading) {
     return (
