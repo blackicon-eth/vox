@@ -410,7 +410,7 @@ export default function PetitionList() {
                     </div>
                   </div>
                   <DialogFooter className="p-6">
-                    {selectedPetition.creator !==
+                    {selectedPetition.creator ===
                     user?.wallet?.address ? null : (
                       <div>
                         {hasVoted ? (
