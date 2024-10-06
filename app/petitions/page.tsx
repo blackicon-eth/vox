@@ -155,7 +155,7 @@ export default function PetitionList() {
       const { data: data2, error: error2 } = await supabase
         .from("petition")
         .update({
-          votes: (selectedPetition?.votes || 0) - 1,
+          votes: (selectedPetition?.votes || 0) + 1,
         })
         .eq("id", selectedPetition?.id);
 
