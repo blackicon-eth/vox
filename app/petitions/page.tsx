@@ -162,7 +162,7 @@ export default function PetitionList() {
       if (error2) {
         throw new Error("Failed to insert data into the database");
       } else {
-        // console.log("Data inserted successfully:", data);
+        console.log("Data inserted successfully:", data);
         console.log("Data updated successfully:", data2);
         setSignLoading(false);
         setSuccess(true);
