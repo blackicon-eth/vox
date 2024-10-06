@@ -27,11 +27,15 @@ import { usePrivy } from "@privy-io/react-auth";
 import { Petition } from "@/lib/supabase/types";
 import { hasUserIdentity, shortenAddress } from "@/lib/utils";
 import { VotesChart } from "../../components/ui/petition-radial-chart";
+import { LoadingSpinner } from "@/components/ui/loadingSpinner";
 
 export default function PetitionList() {
   const [petitions, setPetitions] = useState<Petition[]>([]);
+  const [hasVoted, setHasVoted] = useState(false);
   const [hasIdentity, setHasIdentity] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [signLoading, setSignLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedPetition, setSelectedPetition] = useState<Petition | null>(
@@ -81,10 +85,95 @@ export default function PetitionList() {
           setHasIdentity(identity);
         }
       };
+      const checkHasVoted = async () => {
+        if (user && user.wallet?.address) {
+          const { data, error } = await supabase
+            .from("vote")
+            .select("*")
+            .eq("signer", user.wallet.address.toString() || "");
+          if (error) {
+            console.error("Error fetching votes:", error);
+            setHasVoted(false);
+          } else {
+            setHasVoted(data?.length > 0);
+          }
+        }
+      };
       fetchPetitions();
       checkIdentity();
+      checkHasVoted();
     }
   }, [authenticated, currentPage, fetchPetitions, showUserPetitions, user]);
+
+  const handleSignAnonymously = async () => {
+    setSignLoading(true);
+
+    if (!user || !user.wallet?.address) {
+      console.error("User address is not available.");
+      setSignLoading(false);
+      return;
+    }
+
+    try {
+      const args = {
+        petitionId: selectedPetition?.id,
+        voter: user.wallet.address,
+      };
+      const res = await fetch("/api/vote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: args,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(`Failed to write petition onchain: ${error}`);
+      }
+    } catch (error: any) {
+      console.log(error.message);
+      setSignLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.from("vote").insert([
+        {
+          signer: user.wallet.address,
+          permit: false,
+        },
+      ]);
+
+      if (error) {
+        console.error("Error inserting data:", error);
+        throw new Error("Failed to insert data into the database");
+      }
+
+      const { data: data2, error: error2 } = await supabase
+        .from("petition")
+        .update({
+          votes: (selectedPetition?.votes || 0) - 1,
+        })
+        .eq("id", selectedPetition?.id);
+
+      if (error2) {
+        throw new Error("Failed to insert data into the database");
+      } else {
+        // console.log("Data inserted successfully:", data);
+        console.log("Data updated successfully:", data2);
+        setSignLoading(false);
+        setSuccess(true);
+        // You might want to redirect the user or show a success message here
+        router.push("/petitions");
+      }
+    } catch (error) {
+      setSignLoading(false);
+      console.error("Unexpected error:", error);
+    }
+  };
 
   if (!ready || loading) {
     return (
@@ -309,25 +398,47 @@ export default function PetitionList() {
                       </p>
                     </div>
                     <div className="flex-shrink-0 w-[250px]">
-                      <VotesChart />
+                      <VotesChart
+                        chartData={[
+                          {
+                            browser: "safari",
+                            signers: selectedPetition.votes ?? 0,
+                            fill: "hsl(var(--chart-2))",
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
                   <DialogFooter className="p-6">
-                    {selectedPetition.creator ===
+                    {selectedPetition.creator !==
                     user?.wallet?.address ? null : (
-                      <div className="flex justify-center items-center gap-3">
-                        <Button
-                          onClick={() => console.log("Sign anonymously")}
-                          className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
-                        >
-                          Sign Anonymously
-                        </Button>
-                        <Button
-                          onClick={() => console.log("Sign as doxxed")}
-                          className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
-                        >
-                          Sign as Doxxed
-                        </Button>
+                      <div>
+                        {hasVoted ? (
+                          <div className="text-green-500">
+                            You have already signed this petition. Thanks!
+                          </div>
+                        ) : signLoading ? (
+                          <LoadingSpinner />
+                        ) : !signLoading && success ? (
+                          <div className="text-green-500">
+                            Successfully signed!
+                          </div>
+                        ) : (
+                          <div className="flex justify-center items-center gap-3">
+                            <Button
+                              onClick={handleSignAnonymously}
+                              className="bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
+                            >
+                              Sign Anonymously
+                            </Button>
+                            <Button
+                              onClick={handleSignAnonymously}
+                              className="bg-[#5e3a1a] hover:bg-[#4a2c0f] text-[#f0e7d8]"
+                            >
+                              Sign as Doxxed
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </DialogFooter>

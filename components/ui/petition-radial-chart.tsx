@@ -10,13 +10,10 @@ import {
 
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 
-const chartData = [
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-];
-
+// Define the chart configuration
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  signers: {
+    label: "Signatures",
   },
   safari: {
     label: "Safari",
@@ -24,7 +21,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function VotesChart() {
+// Define the prop types for the VotesChart component
+interface VotesChartProps {
+  chartData: {
+    browser: string;
+    signers: number;
+    fill: string;
+  }[];
+}
+
+// Define the VotesChart component
+export function VotesChart({ chartData }: VotesChartProps) {
   return (
     <ChartContainer
       config={chartConfig}
@@ -32,8 +39,8 @@ export function VotesChart() {
     >
       <RadialBarChart
         data={chartData}
-        startAngle={0}
-        endAngle={250}
+        startAngle={270}
+        endAngle={Math.round((chartData[0].signers / 150) * 360) + 270}
         innerRadius={80}
         outerRadius={110}
       >
@@ -44,7 +51,7 @@ export function VotesChart() {
           className="first:fill-muted last:fill-transparent"
           polarRadius={[86, 74]}
         />
-        <RadialBar dataKey="visitors" background cornerRadius={10} />
+        <RadialBar dataKey="signers" background cornerRadius={10} />
         <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
           <Label
             content={({ viewBox }) => {
@@ -61,14 +68,14 @@ export function VotesChart() {
                       y={viewBox.cy}
                       className="fill-foreground text-4xl font-bold"
                     >
-                      {chartData[0].visitors.toLocaleString()}
+                      {chartData[0].signers.toLocaleString()}
                     </tspan>
                     <tspan
                       x={viewBox.cx}
                       y={(viewBox.cy || 0) + 24}
                       className="fill-muted-foreground"
                     >
-                      Visitors
+                      Signers
                     </tspan>
                   </text>
                 );

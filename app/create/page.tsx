@@ -15,6 +15,8 @@ import { hasUserIdentity } from "@/lib/utils";
 export default function CreatePetition() {
   const { ready, authenticated, user } = usePrivy();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [extendedDescription, setExtendedDescription] = useState("");
@@ -52,10 +54,41 @@ export default function CreatePetition() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
 
     if (!user || !user.wallet?.address) {
       console.error("User address is not available.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const args = {
+        creator: user.wallet.address,
+        title,
+        description,
+        extendedDescription,
+        endDate,
+        goal,
+      };
+      const res = await fetch("/api/petition", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: args,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(`Failed to write petition onchain: ${error}`);
+      }
+    } catch (error: any) {
+      console.log(error.message);
+      setLoading(false);
       return;
     }
 
@@ -73,12 +106,16 @@ export default function CreatePetition() {
       ]);
 
       if (error) {
-        console.error("Error inserting data:", error);
+        throw new Error("Failed to insert data into the database");
       } else {
         console.log("Data inserted successfully:", data);
+        setLoading(false);
+        setSuccess(true);
         // You might want to redirect the user or show a success message here
+        router.push("/petitions");
       }
     } catch (error) {
+      setLoading(false);
       console.error("Unexpected error:", error);
     }
   };
@@ -118,6 +155,16 @@ export default function CreatePetition() {
       },
     },
   };
+
+  const isDisabled =
+    !user ||
+    !title ||
+    !description ||
+    !extendedDescription ||
+    !endDate ||
+    !goal ||
+    loading ||
+    success;
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#f0e7d8] p-4 my-14">
@@ -218,8 +265,28 @@ export default function CreatePetition() {
             <Button
               type="submit"
               className="w-full bg-[#8b4513] hover:bg-[#6e3710] text-[#f0e7d8]"
+              disabled={isDisabled}
             >
-              Create Petition
+              {loading ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="animate-spin"
+                >
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+              ) : success ? (
+                "Petition Created!"
+              ) : (
+                "Create Petition"
+              )}
             </Button>
           </form>
         </motion.div>

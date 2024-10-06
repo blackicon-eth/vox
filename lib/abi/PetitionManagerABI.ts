@@ -1,7 +1,12 @@
 export const PetitionManagerContract =
-  "0xe20E81DeD401367F694D9E90628C8d1BDca1D87a";
+  "0x32BdE3BBa8d4de1cbc2C293C2159B868CFCf48d7";
 
 export const PetitionManagerABI = [
+  {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
   {
     inputs: [],
     name: "AlreadyVoted",
@@ -46,6 +51,28 @@ export const PetitionManagerABI = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "OwnableInvalidOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "OwnableUnauthorizedAccount",
+    type: "error",
+  },
+  {
     inputs: [],
     name: "PetitionDoesNotExist",
     type: "error",
@@ -54,6 +81,25 @@ export const PetitionManagerABI = [
     inputs: [],
     name: "PetitionExpired",
     type: "error",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
   },
   {
     anonymous: false,
@@ -81,11 +127,36 @@ export const PetitionManagerABI = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
         name: "_petitionId",
         type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "voter",
+        type: "address",
       },
     ],
     name: "vote",
@@ -175,6 +246,19 @@ export const PetitionManagerABI = [
         internalType: "bool",
         name: "",
         type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
