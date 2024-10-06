@@ -118,30 +118,30 @@ export default function PetitionList() {
       return;
     }
 
-    // try {
-    //   const args = {
-    //     petitionId: selectedPetition?.id,
-    //     voter: user.wallet.address,
-    //   };
-    //   const res = await fetch("/api/vote", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       data: args,
-    //     }),
-    //   });
+    try {
+      const args = {
+        petitionId: selectedPetition?.id,
+        voter: user.wallet.address,
+      };
+      const res = await fetch("/api/vote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: args,
+        }),
+      });
 
-    //   if (!res.ok) {
-    //     const error = await res.text();
-    //     throw new Error(`Failed to write petition onchain: ${error}`);
-    //   }
-    // } catch (error: any) {
-    //   console.log(error.message);
-    //   setSignLoading(false);
-    //   return;
-    // }
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(`Failed to write petition onchain: ${error}`);
+      }
+    } catch (error: any) {
+      console.log(error.message);
+      setSignLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.from("vote").insert([
