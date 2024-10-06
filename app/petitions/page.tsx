@@ -47,7 +47,7 @@ export default function PetitionList() {
 
   const itemsPerPage = 15;
 
-  // Function to check if the user has voted
+  // Function to check if the user has voted.
   const checkHasVoted = async (
     address: string | undefined,
     petitionId: string
