@@ -1,6 +1,6 @@
 {
   "issuer": "ANPR",
-  "desc": "A very big and italian data borner.",
+  "desc": "The official italian registry office website",
   "website": "https://sc.anpr.interno.it/serviziCittadino/home",
   "APIs": [
     {
@@ -14,9 +14,38 @@
           "key": "content|usernameSigner",
           "value": "SPIDUser",
           "operation": "="
+        },
+        {
+          "key": "content|valid",
+          "value": "true",
+          "operation": "="
+        },
+        {
+          "key": "content|nome",
+          "value": "empty",
+          "operation": "!=",
+          "isPublic": true
+        },
+        {
+          "key": "content|cognome",
+          "value": "empty",
+          "operation": "!=",
+          "isPublic": true
+        },
+        {
+          "key": "content|dataNascita",
+          "value": "empty",
+          "operation": "!=",
+          "isPublic": true
+        },
+        {
+          "key": "content|utenteConnesso|codiceFiscale",
+          "value": "empty",
+          "operation": "!=",
+          "isPublic": true
         }
       ],
-      "nullifier": "content|username"
+      "nullifier": "content|idSoggettoANPR"
     }
   ],
   "HRCondition": ["ANPR"],
